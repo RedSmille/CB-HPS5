@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPS - BOT</title>
+    
+    <link rel="icon" href="https://hospitalpediatrico.org/oficial/wp-content/uploads/2022/08/icon-logo-hps.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" href="Estilos.css">
+
+    <div class="container2">   
+        <button class="dark-mode-button" onclick="toggleDarkMode()">Modo Oscuro</button>
+    </div><br>
+
+</head>
+
+<body>
+    <div class="container header-container">
+
+        <div class="dropdown">
+            <button onclick="MenuArea()" class="button">Principales Áreas</button>
+            <div id="especialidadesMenu" class="dropdown-content"></div>
+        </div>
+        
+        <div class="dropdown">
+            <button onclick="MenuAtencion()" class="button">Atención al Publico</button>
+            <div id="atencionMenu" class="dropdown-content"></div>
+        </div>
+
+        <div class="chat-container-header">
+            <a href="EXTENSIONES.pdf" target="_blank"><button class="archivo" style="margin-top: 10px;">Extensiones ➡️</button></a>
+        </div>
+        
+    </div>
+    
+    <div class="container">
+
+        <div class="chat-container-header">
+            <img decoding="async" width="40" style="border: 4px solid #929292;" src="HPS3.png" alt="">
+            <h1>HPS BOT</h1>
+        </div>
+
+        <div id="chatBox" class="chat-box"></div>
+        
+        <div class="chat-input-container">
+            <input id="userInput" class="chat-input" placeholder="Pregunta lo que quieras" onkeydown="if(event.key === 'Enter') sendMessage();">
+            <button class="button" onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        function showMessage(message, type) {
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', type);
+            messageDiv.innerHTML = message.replace(/\n/g, '<br>');
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        // Función para enviar mensajes
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const chatBox = document.getElementById('chatBox');
+            const message = userInput.value.trim();
+
+            if (!message) return;
+
+            showMessage(message, 'user');
+            userInput.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const response = await fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: message })
+            });
+
+            const result = await response.json();
+
+            if (Array.isArray(result.response)) {
+                result.response.forEach(msg => showMessage(msg, 'bot'));
+            } else {
+                showMessage(result.response, 'bot');
+            }
+        }
+
+        function Mostrar(text) {
+            // Ocultar la lista de especialidades
+            const menu = document.getElementById("especialidadesMenu");
+            if (menu) {
+                menu.style.display = "none";
+            }
+
+            const atencionMenu = document.getElementById("atencionMenu");
+            if (atencionMenu) {
+                atencionMenu.style.display = "none";
+            }
+
+            // Escribir automáticamente y enfocar el input
+            const input = document.getElementById("userInput");
+            input.value = text;
+            input.focus(); // ← ENFOCAR EL INPUT
+            sendMessage();
+        }
+
+        // Activar modo oscuro
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Mensajes de bienvenida con imagen
+        window.onload = function() {
+            showMessage("Hola, soy el <b>Chat BOT</b> del <b>Hospital Pediátrico de Sinaloa</b>. ¿Quieres saber algo? <b>Pregúntame</b> lo que quieras sobre la organización.", 'bot');
+            showMessage("<b>Tópicos Populares</b>" 
+                            + '\n<button class="info" onclick="Mostrar(\'Citas y Consultas\')">Citas y Consultas</button><b> </b>'
+                            + '<button class="infoArea" onclick="Mostrar(\'Donaciones\')">Donaciones</button><b> </b>'
+                            + '<button class="infoArea" onclick="Mostrar(\'Teléfono\')">Teléfono</button><b> </b>'
+                            + '<button class="info" onclick="Mostrar(\'Ubicación\')">Ubicación</button><b> </b>'
+                        , 'bot');
+            showMessage('<div class="elemento_interno spinner"></div>', 'bot');
+            
+            document.getElementById('userInput').focus();
+        }; 
+
+        function MenuArea() {
+            var menu = document.getElementById("especialidadesMenu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        }
+
+        document.addEventListener("click", function(event) {
+            var menu = document.getElementById("especialidadesMenu");
+            var button = document.querySelector(".button");
+
+            if (!menu.contains(event.target) && !button.contains(event.target)) {
+            menu.style.display = "none";
+            }
+        });
+
+        const especialidades = [
+            "Adquisiciones", "Alianza Estratégica", "Almacén General", "Sub Almacén", "Apoyo Nutricional",
+            "Archivo Clínico", "Banco de Leche", "Banco de Sangre", "Biomédica Ingeniería",
+            "Calidad Hospitalaria", "Cardiología", "Central de Cuentas", "Centro de Mezclas",
+            "CEYE", "Cirugía", "Clínica de Heridas", "Cobranza", "Cocina", "Consulta Externa",
+            "Contabilidad", "Contraloría Interna", "Dental", "Enfermería", "Enseñanza Medica",
+            "Epidemiología", "Especialidades", "Farmacia", "Gastroenterología", "Genética",
+            "Hemodiálisis", "Infectología", "Informática", "Informes Recepción", "INSABI",
+            "Investigación Médica", "Inhaloterapia", "Jurídico",
+            "Laboratorio", "Mantenimiento", "Medicina Interna", "Medicina Legal",
+            "Medicina Preventiva", "Medicina Transfusional", "Módulo de Información",
+            "Neonatología", "Oncología", "Patología", "Programa VIH", "Quirofano (QX)", "Cirugia", 
+            "Rayos X", "Recetas", "Recursos Financieros",
+            "Recursos Humanos", "Residentes", "Soporte Técnico", 
+            "Subdirección", "Trabajo Social", "Urgencias"
+        ];
+
+        const menu = document.getElementById("especialidadesMenu");
+
+        especialidades.forEach(area => {
+            const button = document.createElement("button");
+            button.className = "info";
+            button.textContent = area;
+            button.onclick = () => Mostrar(area);
+            menu.appendChild(button);
+        });
+
+        // ------------------------------------------------------------------------------
+
+        function MenuAtencion() {
+            var menu = document.getElementById("atencionMenu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        }
+
+        document.addEventListener("click", function(event) {
+            var menu = document.getElementById("atencionMenu");
+            var button = document.querySelector('button[onclick="MenuAtencion()"]');
+
+            if (!menu.contains(event.target) && !button.contains(event.target)) {
+            menu.style.display = "none";
+            }
+        });
+
+        const atencion = [
+            "Citas y Consultas", "Credencial IMSS", "Informes Recepción", "Módulo de Información", "Teléfono", "Extensiones", "Correo", "Ubicación", "Horarios",
+            "Visitas", "Páginas Web", "Redes Sociales", "Especialidades", "Donaciones", "INSABI", "Enfermería"
+        ];
+
+        const atencionMenu = document.getElementById("atencionMenu");
+
+        atencion.forEach(item => {
+            const button = document.createElement("button");
+            button.className = "info";
+            button.textContent = item;
+            button.onclick = () => Mostrar(item);
+            atencionMenu.appendChild(button);
+        });
+
+    </script>
+</body>
+</html>
