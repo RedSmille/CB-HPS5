@@ -3,7 +3,7 @@ body {
     font-size: 15px;
     margin: 0; 
     padding: 0; 
-    background: url('Fondo.jpg') no-repeat center center fixed; 
+    background: url('Fondo2.jpg') no-repeat center center fixed; 
     background-size: cover; 
     transition: background-color 0.3s;
 }
